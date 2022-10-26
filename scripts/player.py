@@ -25,6 +25,7 @@ class Player(Entity):
         self.state = IDLE
         self.flip = False
         self.pick_up = False
+        self.pick_up_sound = pg.mixer.Sound('./sfx/click.wav')
         self.collidable_groups = collidable_groups
         self.id = id_
 
@@ -75,6 +76,7 @@ class Player(Entity):
             if self.pick_up and math.hypot(self.rect.centerx - sprite.rect.centerx,
                                            self.rect.centery - sprite.rect.centery) <= TILE_SIZE * 1.5:
                 list_of_items.append(sprite.__class__.__name__)
+                self.pick_up_sound.play()
                 sprite.kill()
         return list_of_items
 

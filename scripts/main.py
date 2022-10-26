@@ -31,6 +31,8 @@ class Game:
         self.stations = pg.sprite.Group()
         self.controllers = pg.sprite.Group()
 
+        self.place_sound = pg.mixer.Sound('./sfx/click.wav')
+
         self.players = [None, None]
         self.player_num = 0
         self.menu_entity = Menu(self.non_moving_sprites, (0, 0))
@@ -113,6 +115,7 @@ class Game:
                                     break
                             if not kill:
                                 self.item_list.remove(item)
+                                self.place_sound.play()
                                 break
                 elif event.key == pg.K_e:
                     self.players[self.player_num].pressed_e()

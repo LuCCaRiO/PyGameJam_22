@@ -31,9 +31,11 @@ class DoorTile(Tile):
         super(DoorTile, self).__init__(groups, pg.image.load('./imgs/tiles/Door.png'), pos)
         self.groups_ = groups
         self.keys = keys
+        self.explosion_sound = pg.mixer.Sound('./sfx/explosion.wav')
 
     def update(self, delta_time, player_num, open_door, players):
         if open_door >= self.keys:
+            self.explosion_sound.play()
             self.kill()
 
 
