@@ -1,4 +1,5 @@
 import sys
+import os
 import pygame as pg
 import time
 import math
@@ -39,7 +40,7 @@ class Game:
         self.font = pg.font.SysFont('bahnschrift', 50)
         self.offset = pg.math.Vector2
 
-        with open('D:/PycharmProjects/PyGameJam Hw 2022/ savegame/level', 'r') as file:
+        with open(f'{os.getcwd()}/ savegame/level', 'r') as file:
             self.level = int(file.readline()[0])
 
         self.menu = True
@@ -52,7 +53,7 @@ class Game:
             if not self.menu:
                 if self.players[self.player_num].custom_collision():
                     self.level += 1
-                    with open('D:/PycharmProjects/PyGameJam Hw 2022/ savegame/level', 'w') as file:
+                    with open(f'{os.getcwd()}/ savegame/level', 'w') as file:
                         file.truncate()
                         file.writelines(str(self.level))
                     self.rendered_sprites.empty()
