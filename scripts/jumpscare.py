@@ -4,6 +4,7 @@ import math
 from entity import Entity
 from settings import *
 
+
 MAX_TIME = 2000
 
 

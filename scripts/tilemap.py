@@ -42,7 +42,7 @@ class Tilemap:
                     StationTile(self.groups[STATION_KEY], pg.image.load('./imgs/tiles/box_place.png'),
                                 (TILE_SIZE * j, TILE_SIZE * i), self.collidable_groups[STATION_KEY])
                 if '5' in row:
-                    Tile(self.groups[EXIT_KEY], pg.image.load('./imgs/tiles/New Piskel.png'),
+                    Tile(self.groups[EXIT_KEY], pg.image.load('./imgs/tiles/exit_tile.png'),
                          (TILE_SIZE * j, TILE_SIZE * i))
                 if '6' in row:
                     Monemy(self.groups[MONEMY_KEY], (TILE_SIZE * j, TILE_SIZE * i), self.collidable_groups[MONEMY_KEY])
