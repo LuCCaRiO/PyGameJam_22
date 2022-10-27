@@ -13,7 +13,8 @@ MOVING_SPEED = 0.15
 
 class Monemy(Enemy):  # Moveable Enemy
     def __init__(self, groups, pos, collidable_groups):
-        super(Monemy, self).__init__(groups, pg.image.load('./imgs/player_sheet/Layer 1_player_sheet1.png'), pos)
+        super(Monemy, self).__init__(groups, pg.transform.scale(pg.image.load('./imgs/Enemy.png'),
+                                                                (TILE_SIZE * 3, TILE_SIZE * 3)), pos)
         self.speed = pg.math.Vector2(MOVING_SPEED, 0)
         self.collidable_groups = collidable_groups
 
@@ -30,6 +31,6 @@ class Monemy(Enemy):  # Moveable Enemy
     def move(self, delta_time):
         self.rect.topleft += self.speed * delta_time
 
-    def update(self, delta_time, player_num, open_door):
+    def update(self, delta_time, player_num, open_door, players):
         self.set_speed()
         self.move(delta_time)

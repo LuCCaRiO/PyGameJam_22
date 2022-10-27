@@ -2,6 +2,7 @@ import pygame as pg
 from settings import *
 from item import Box
 from tile import DoorTile
+from enemy import Monemy
 from tilemap import Tilemap
 import random
 
@@ -37,6 +38,6 @@ class Camera(pg.sprite.Group):
 
                 self.offset.y += ((height * TILE_SIZE - SCREEN_HEIGHT) - self.offset.y) / SMOOTHNESS
 
-        for sprite in sorted(self.sprites(), key=lambda sprite_: isinstance(sprite_, Box) or isinstance(sprite_, DoorTile)):
+        for sprite in sorted(self.sprites(), key=lambda sprite_: (isinstance(sprite_, Box), isinstance(sprite_, DoorTile), isinstance(sprite_, Monemy))):
             screen.blit(sprite.image, sprite.rect.topleft - self.offset)
         return self.offset

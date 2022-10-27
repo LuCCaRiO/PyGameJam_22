@@ -179,9 +179,18 @@ class Game:
             self.players.append(Player(self.rendered_sprites, (TILE_SIZE * 5, TILE_SIZE * 5),
                                        {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites,
                                         MONEMY_KEY: self.enemys}, 0))
+        elif level == 6:
+            self.tilemap('./lvls/Level6.csv')
+            self.players = []
+            self.players.append(Player(self.rendered_sprites, (TILE_SIZE * 2, TILE_SIZE),
+                                       {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites,
+                                        MONEMY_KEY: self.enemys}, 0))
+            self.players.append(Player(self.rendered_sprites, (TILE_SIZE * 15, TILE_SIZE * 5),
+                                       {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites,
+                                        MONEMY_KEY: self.enemys}, 1))
 
     def render(self):
-        self.screen.fill((50, 50, 50))
+        self.screen.fill((30, 26, 30))
         self.offset = self.rendered_sprites.custom_draw(self.screen, self.players[self.player_num],
                                                         f'./lvls/Level{self.level}.csv')
         self.non_moving_sprites.draw(self.screen)

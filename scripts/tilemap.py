@@ -26,7 +26,7 @@ class Tilemap:
         map_ = self.read_csv(self.file_name)
         for i in range(len(map_)):
             for j, row in enumerate(map_[i]):
-                if '1' in row:
+                if '1' in row and row != '-1':
                     Tile(self.groups[WALL_KEY], pg.image.load('./imgs/tiles/tile_2.png'),
                          (TILE_SIZE * j, TILE_SIZE * i))
                 if '0' in row:
