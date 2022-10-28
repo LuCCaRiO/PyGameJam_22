@@ -1,5 +1,6 @@
 import math
 import sys
+import os
 from text import Text
 import pygame as pg
 from settings import *
@@ -90,10 +91,12 @@ class Player(Entity):
         return list_of_items
 
     def custom_collision(self, level, delta_time):
-        print(self.time)
         if self.exit and self.time < MAX_TIME:
             self.time += delta_time
         elif self.exit and self.time > MAX_TIME:
+            with open(f'{os.getcwd()}\savegame\level', 'w') as file:
+                file.truncate()
+                file.writelines('1')
             sys.exit()
 
         for sprite in self.collidable_groups[EXIT_KEY]:

@@ -42,7 +42,7 @@ class Game:
         self.font = pg.font.SysFont('bahnschrift', 30)
         self.offset = pg.math.Vector2
 
-        with open(f'{os.getcwd()}/ savegame/level', 'r') as file:
+        with open(f'{os.getcwd()}/savegame/level', 'r') as file:
             self.level = int(file.readline()[0])
 
         self.menu = True
@@ -59,7 +59,7 @@ class Game:
                         self.create_world(self.level)
                 if self.players[self.player_num].custom_collision(self.level, delta_time):
                     self.level += 1
-                    with open(f'{os.getcwd()}/ savegame/level', 'w') as file:
+                    with open(f'{os.getcwd()}/savegame/level', 'w') as file:
                         file.truncate()
                         file.writelines(str(self.level))
                     self.rendered_sprites.empty()
@@ -215,5 +215,4 @@ class Game:
 
 if __name__ == '__main__':
     pg.init()
-    print(pg.font.get_fonts())
     Game().run()
