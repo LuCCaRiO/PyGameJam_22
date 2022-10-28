@@ -53,6 +53,10 @@ class Game:
             delta_time = clock.tick(FPS)
             open_door = 0
             if not self.menu:
+                for player in self.players:
+                    if player.enemy_collision(delta_time):
+                        self.reset()
+                        self.create_world(self.level)
                 if self.players[self.player_num].custom_collision():
                     self.level += 1
                     with open(f'{os.getcwd()}/ savegame/level', 'w') as file:
@@ -91,6 +95,7 @@ class Game:
         self.players = [None, None]
         self.player_num = 0
         self.item_list = []
+        pg.mixer.stop()
 
     def handle_events(self):
         mouse = pg.mouse.get_pos()
@@ -98,40 +103,41 @@ class Game:
             if event.type == pg.QUIT:
                 sys.exit()
             elif event.type == pg.KEYDOWN:
-                if event.key == pg.K_q:
-                    for item in self.item_list:
-                        if item == 'Box' and math.hypot(
-                                self.players[self.player_num].rect.centerx - mouse[0] - self.offset.x,
-                                self.players[self.player_num].rect.centery - mouse[1] - self.offset.y) <= TILE_SIZE * 2:
-                            x = int((mouse[0] + self.offset.x) / TILE_SIZE) * TILE_SIZE
-                            y = int((mouse[1] + self.offset.y) / TILE_SIZE) * TILE_SIZE
-                            box = Box((self.rendered_sprites, self.items), (x, y))
-                            kill = False
-                            merged_group = self.walls.sprites() + self.enemys.sprites()
-                            for enemy in merged_group:
-                                if box.rect.colliderect(enemy.rect):
-                                    box.kill()
-                                    kill = True
-                                    break
-                            if not kill:
-                                self.item_list.remove(item)
-                                self.place_sound.play()
-                                break
-                elif event.key == pg.K_e:
+                if event.key == pg.K_e:
                     self.players[self.player_num].pressed_e()
                 elif event.key == pg.K_SPACE and self.level > 2 and self.level != 5:
                     if self.player_num == 0:
                         self.player_num = 1
                     else:
                         self.player_num = 0
+            elif event.type == pg.MOUSEBUTTONDOWN:
+                for item in self.item_list:
+                    if item == 'Box' and math.hypot(
+                            self.players[self.player_num].rect.centerx - mouse[0] - self.offset.x,
+                            self.players[self.player_num].rect.centery - mouse[1] - self.offset.y) <= TILE_SIZE * 2:
+                        x = int((mouse[0] + self.offset.x) / TILE_SIZE) * TILE_SIZE
+                        y = int((mouse[1] + self.offset.y) / TILE_SIZE) * TILE_SIZE
+                        box = Box((self.rendered_sprites, self.items, self.walls), (x, y))
+                        kill = False
+                        merged_group = self.walls.sprites() + self.enemys.sprites() + self.players
+                        for enemy in merged_group:
+                            if box.rect.colliderect(enemy.rect) and enemy != box:
+                                box.kill()
+                                kill = True
+                                break
+                        if not kill:
+                            self.item_list.remove(item)
+                            self.place_sound.play()
+                            break
 
     def tilemap(self, file):
         Tilemap(file, {WALL_KEY: (self.rendered_sprites, self.walls),
                        MONEMY_KEY: (self.rendered_sprites, self.enemys),
-                       ITEM_KEY: (self.rendered_sprites, self.items), NORMAL_KEY: self.rendered_sprites,
+                       ITEM_KEY: (self.rendered_sprites, self.items, self.walls), NORMAL_KEY: self.rendered_sprites,
                        STATION_KEY: (self.rendered_sprites, self.stations),
                        DOOR_KEY: (self.rendered_sprites, self.walls),
-                       EXIT_KEY: (self.rendered_sprites, self.exit_sprites), JUMPSCARE_KEY: self.non_moving_sprites},
+                       EXIT_KEY: (self.rendered_sprites, self.exit_sprites), JUMPSCARE_KEY: self.non_moving_sprites,
+                       TEXT_KEY: self.non_moving_sprites},
                 {MONEMY_KEY: {WALL_KEY: self.walls, ITEM_KEY: self.items},
                  STATION_KEY: {ITEM_KEY: self.items}}).create_tilemap()
 
@@ -140,17 +146,21 @@ class Game:
             self.tilemap('./lvls/Level1.csv')
             self.players = []
             self.players.append(Player(self.rendered_sprites, (TILE_SIZE * 5, TILE_SIZE * 5),
-                                       {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites}, 0))
-            text = self.font.render('W, A, S, D To Move', False, (255, 255, 255))
+                                       {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites,
+                                        MONEMY_KEY: self.enemys}, 0,
+                                       self.non_moving_sprites))
+            text = self.font.render('W, A, S, D TO MOVE', False, (255, 255, 255))
             Text(self.non_moving_sprites, text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 0))
 
         elif level == 2:
             self.tilemap('./lvls/Level2.csv')
             self.players = []
             self.players.append(Player(self.rendered_sprites, (TILE_SIZE * 5, TILE_SIZE * 5),
-                                       {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites}, 0))
-            text = self.font.render('E To Pick Up Boxes', False, (255, 255, 255))
-            text2 = self.font.render('Q To Place Down Boxes', False, (255, 255, 255))
+                                       {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites,
+                                        MONEMY_KEY: self.enemys}, 0,
+                                       self.non_moving_sprites))
+            text = self.font.render('E TO PICK UP BOXES', False, (255, 255, 255))
+            text2 = self.font.render('LEFT MOUSE BUTTON TO PLACE DOWN BOXES', False, (255, 255, 255))
             Text(self.non_moving_sprites, text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 0))
             Text(self.non_moving_sprites, text2, (SCREEN_WIDTH // 2 - text2.get_width() // 2, text.get_height()))
 
@@ -159,35 +169,39 @@ class Game:
 
             self.players = []
             self.players.append(Player(self.rendered_sprites, (TILE_SIZE * 5, TILE_SIZE * 5),
-                                       {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites}, 0))
+                                       {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites,
+                                        MONEMY_KEY: self.enemys}, 0,
+                                       self.non_moving_sprites))
             self.players.append(Player(self.rendered_sprites, (TILE_SIZE * 20, TILE_SIZE * 5),
-                                       {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites}, 1))
-            text = self.font.render('Space To Switch Players', False, (255, 255, 255))
+                                       {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites,
+                                        MONEMY_KEY: self.enemys}, 1,
+                                       self.non_moving_sprites))
+            text = self.font.render('SPACE TO SWITCH BETWEEN PLAYERS', False, (255, 255, 255))
             Text(self.non_moving_sprites, text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 0))
         elif level == 4:
             self.tilemap('./lvls/Level4.csv')
             self.players = []
             self.players.append(Player(self.rendered_sprites, (TILE_SIZE * 3, TILE_SIZE * 2),
                                        {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites,
-                                        MONEMY_KEY: self.enemys}, 0))
+                                        MONEMY_KEY: self.enemys}, 0, self.non_moving_sprites))
             self.players.append(Player(self.rendered_sprites, (TILE_SIZE * 20, TILE_SIZE * 6),
                                        {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites,
-                                        MONEMY_KEY: self.enemys}, 1))
+                                        MONEMY_KEY: self.enemys}, 1, self.non_moving_sprites))
         elif level == 5:
             self.tilemap('./lvls/Level5.csv')
             self.players = []
             self.players.append(Player(self.rendered_sprites, (TILE_SIZE * 5, TILE_SIZE * 5),
                                        {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites,
-                                        MONEMY_KEY: self.enemys}, 0))
+                                        MONEMY_KEY: self.enemys}, 0, self.non_moving_sprites))
         elif level == 6:
             self.tilemap('./lvls/Level6.csv')
             self.players = []
-            self.players.append(Player(self.rendered_sprites, (TILE_SIZE * 2, TILE_SIZE),
+            self.players.append(Player(self.rendered_sprites, (TILE_SIZE * 4, TILE_SIZE),
                                        {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites,
-                                        MONEMY_KEY: self.enemys}, 0))
+                                        MONEMY_KEY: self.enemys}, 0, self.non_moving_sprites))
             self.players.append(Player(self.rendered_sprites, (TILE_SIZE * 15, TILE_SIZE * 5),
                                        {WALL_KEY: self.walls, ITEM_KEY: self.items, EXIT_KEY: self.exit_sprites,
-                                        MONEMY_KEY: self.enemys}, 1))
+                                        MONEMY_KEY: self.enemys}, 1, self.non_moving_sprites))
 
     def render(self):
         self.screen.fill((30, 26, 30))
@@ -199,4 +213,5 @@ class Game:
 
 if __name__ == '__main__':
     pg.init()
+    print(pg.font.get_fonts())
     Game().run()

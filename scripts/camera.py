@@ -4,6 +4,7 @@ from item import Box
 from tile import DoorTile
 from enemy import Monemy
 from tilemap import Tilemap
+from jumpscare import Jumpscare
 import random
 
 SMOOTHNESS = 7
@@ -38,6 +39,9 @@ class Camera(pg.sprite.Group):
 
                 self.offset.y += ((height * TILE_SIZE - SCREEN_HEIGHT) - self.offset.y) / SMOOTHNESS
 
-        for sprite in sorted(self.sprites(), key=lambda sprite_: (isinstance(sprite_, Box), isinstance(sprite_, DoorTile), isinstance(sprite_, Monemy))):
+        for sprite in sorted(self.sprites(), key=lambda sprite_: (isinstance(sprite_, Jumpscare),
+                                                                  isinstance(sprite_, Monemy),
+                                                                  isinstance(sprite_, DoorTile),
+                                                                  isinstance(sprite_, Box))):
             screen.blit(sprite.image, sprite.rect.topleft - self.offset)
         return self.offset

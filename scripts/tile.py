@@ -2,6 +2,8 @@ import pygame as pg
 import math
 from entity import Entity
 from jumpscare import Jumpscare
+from text import Text
+from enemy import Monemy
 from settings import *
 
 
@@ -39,7 +41,7 @@ class DoorTile(Tile):
             self.kill()
 
 
-DISTANCE = 100
+MAX_DISTANCE = 100
 
 
 class FakeBox(Tile):
@@ -50,6 +52,27 @@ class FakeBox(Tile):
     def update(self, delta_time, player_num, open_door, players):
         distance = math.hypot(self.rect.centerx - players[player_num].rect.centerx,
                               self.rect.centery - players[player_num].rect.centery)
-        if distance <= DISTANCE:
+        if distance <= MAX_DISTANCE:
             Jumpscare(self.jumpscare_groups, (0, 0))
+            self.kill()
+
+
+class FakeTile(Tile):
+    def __init__(self, groups, pos, enemy_groups, enemy_pos, text_groups):
+        super(FakeTile, self).__init__(groups, pg.image.load('./imgs/tiles/New Piskel.png'), pos)
+        self.enemy_groups = enemy_groups
+        self.text_groups = text_groups
+        self.enemey_pos = enemy_pos
+        self.chasing_music = pg.mixer.Sound('./sfx/No_Drums_Or_Percussion-2022-10-10_-_Right_Behind_You_-_www.wav')
+        font = pg.font.SysFont('arial', 80)
+        self.text = font.render('RUN', False, (255, 0, 0))
+
+    def update(self, delta_time, player_num, open_door, players):
+        distance = math.hypot(self.rect.centerx - players[player_num].rect.centerx,
+                              self.rect.centery - players[player_num].rect.centery)
+        if distance <= MAX_DISTANCE:
+            Monemy(self.enemy_groups, self.enemey_pos)
+            Text(self.text_groups, self.text,
+                 (SCREEN_WIDTH // 2 - self.text.get_width() // 2, 0))
+            self.chasing_music.play()
             self.kill()

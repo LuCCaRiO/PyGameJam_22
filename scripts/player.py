@@ -1,9 +1,9 @@
 import math
-
 import pygame as pg
 from settings import *
 from entity import Entity
 from item import Box
+from jumpscare import Jumpscare
 
 MOVING_SPEED = 0.2
 ANIMATION_SPEED = 0.01
@@ -11,9 +11,11 @@ ANIMATION_SPEED = 0.01
 P_WIDTH = TILE_SIZE * 0.4
 P_HEIGHT = TILE_SIZE * 0.6
 
+MAX_TIME = 3000
+
 
 class Player(Entity):
-    def __init__(self, groups, pos, collidable_groups, id_):
+    def __init__(self, groups, pos, collidable_groups, id_, jumpscare_groups):
         self.sheet = (
             pg.transform.scale(pg.image.load('./imgs/player_sheet/Layer 1_player_sheet1.png'), (P_WIDTH, P_HEIGHT)),
             pg.transform.scale(pg.image.load('./imgs/player_sheet/Layer 1_player_sheet2.png'), (P_WIDTH, P_HEIGHT)),
@@ -25,9 +27,12 @@ class Player(Entity):
         self.state = IDLE
         self.flip = False
         self.pick_up = False
+        self.time = 0
+        self.jumpscare = False
         self.pick_up_sound = pg.mixer.Sound('./sfx/click.wav')
         self.collidable_groups = collidable_groups
         self.id = id_
+        self.jumpscare_groups = jumpscare_groups
 
     def input(self):
         self.speed = pg.math.Vector2()
@@ -100,6 +105,19 @@ class Player(Entity):
         self.horizontal_collision()
         self.rect.y += self.speed.y * delta_time
         self.vertical_collision()
+
+    def enemy_collision(self, delta_time):
+        if self.jumpscare:
+            self.time += delta_time
+        for sprite in self.collidable_groups[MONEMY_KEY]:
+            if sprite.rect.colliderect(self.rect):
+                sprite.kill()
+                Jumpscare(self.jumpscare_groups, (0, 0))
+                self.jumpscare = True
+        if self.time > MAX_TIME and self.jumpscare:
+            return True
+        else:
+            return False
 
     def update(self, delta_time, player_num, open_door, players):
         self.pick_up = False

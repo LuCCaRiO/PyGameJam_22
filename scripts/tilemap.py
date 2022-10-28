@@ -1,7 +1,7 @@
 import pygame as pg
 import os
 import csv
-from tile import Tile, StationTile, DoorTile, FakeBox
+from tile import Tile, StationTile, DoorTile, FakeBox, FakeTile
 from enemy import Monemy
 from item import Box
 from settings import *
@@ -45,6 +45,6 @@ class Tilemap:
                     Tile(self.groups[EXIT_KEY], pg.image.load('./imgs/tiles/exit_tile.png'),
                          (TILE_SIZE * j, TILE_SIZE * i))
                 if '6' in row:
-                    Monemy(self.groups[MONEMY_KEY], (TILE_SIZE * j, TILE_SIZE * i), self.collidable_groups[MONEMY_KEY])
+                    FakeTile(self.groups[WALL_KEY], (TILE_SIZE * j, TILE_SIZE * i), self.groups[MONEMY_KEY], (TILE_SIZE, TILE_SIZE), self.groups[TEXT_KEY])
                 if '8' in row:
-                    FakeBox(self.groups[WALL_KEY], (TILE_SIZE * j, TILE_SIZE * i), self.groups[JUMPSCARE_KEY])
+                    FakeBox(self.groups[NORMAL_KEY], (TILE_SIZE * j, TILE_SIZE * i), self.groups[JUMPSCARE_KEY])
