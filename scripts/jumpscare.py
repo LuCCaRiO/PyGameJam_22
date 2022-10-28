@@ -5,7 +5,7 @@ from entity import Entity
 from settings import *
 
 
-MAX_TIME = 2000
+MAX_TIME = 3000
 SHAKE = 5
 
 
