@@ -19,7 +19,7 @@ from dark_view_field import DarkViewField
 
 class Game:
     def __init__(self):
-        self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pg.FULLSCREEN)
+        self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pg.display.set_caption(GAME_NAME)
 
         self.rendered_sprites = Camera()
@@ -39,7 +39,7 @@ class Game:
 
         self.item_list = []
 
-        self.font = pg.font.SysFont('bahnschrift', 50)
+        self.font = pg.font.SysFont('bahnschrift', 30)
         self.offset = pg.math.Vector2
 
         with open(f'{os.getcwd()}/ savegame/level', 'r') as file:
@@ -177,7 +177,9 @@ class Game:
                                         MONEMY_KEY: self.enemys}, 1,
                                        self.non_moving_sprites))
             text = self.font.render('SPACE TO SWITCH BETWEEN PLAYERS', False, (255, 255, 255))
+            text2 = self.font.render('YOU HAVE THE SAME INVENTORY', False, (255, 255, 255))
             Text(self.non_moving_sprites, text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 0))
+            Text(self.non_moving_sprites, text2, (SCREEN_HEIGHT // 2 - text2.get_width() // 2, text.get_width()))
         elif level == 4:
             self.tilemap('./lvls/Level4.csv')
             self.players = []
