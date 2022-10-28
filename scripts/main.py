@@ -57,7 +57,7 @@ class Game:
                     if player.enemy_collision(delta_time):
                         self.reset()
                         self.create_world(self.level)
-                if self.players[self.player_num].custom_collision():
+                if self.players[self.player_num].custom_collision(self.level, delta_time):
                     self.level += 1
                     with open(f'{os.getcwd()}/ savegame/level', 'w') as file:
                         file.truncate()
@@ -113,8 +113,10 @@ class Game:
             elif event.type == pg.MOUSEBUTTONDOWN:
                 for item in self.item_list:
                     if item == 'Box' and math.hypot(
-                            self.players[self.player_num].rect.centerx - mouse[0] - self.offset.x,
-                            self.players[self.player_num].rect.centery - mouse[1] - self.offset.y) <= TILE_SIZE * 2:
+                            int(self.players[self.player_num].rect.centerx / TILE_SIZE) * TILE_SIZE - int(
+                                (mouse[0] + self.offset.x) / TILE_SIZE) * TILE_SIZE,
+                            int(self.players[self.player_num].rect.centery / TILE_SIZE) * TILE_SIZE - int(
+                                (mouse[1] + self.offset.y) / TILE_SIZE) * TILE_SIZE) <= TILE_SIZE * 1.5:
                         x = int((mouse[0] + self.offset.x) / TILE_SIZE) * TILE_SIZE
                         y = int((mouse[1] + self.offset.y) / TILE_SIZE) * TILE_SIZE
                         box = Box((self.rendered_sprites, self.items, self.walls), (x, y))
@@ -177,9 +179,7 @@ class Game:
                                         MONEMY_KEY: self.enemys}, 1,
                                        self.non_moving_sprites))
             text = self.font.render('SPACE TO SWITCH BETWEEN PLAYERS', False, (255, 255, 255))
-            text2 = self.font.render('YOU HAVE THE SAME INVENTORY', False, (255, 255, 255))
             Text(self.non_moving_sprites, text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 0))
-            Text(self.non_moving_sprites, text2, (SCREEN_WIDTH // 2 - text2.get_width() // 2, text.get_width()))
         elif level == 4:
             self.tilemap('./lvls/Level4.csv')
             self.players = []
