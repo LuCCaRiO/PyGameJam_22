@@ -179,7 +179,7 @@ class Game:
             text = self.font.render('SPACE TO SWITCH BETWEEN PLAYERS', False, (255, 255, 255))
             text2 = self.font.render('YOU HAVE THE SAME INVENTORY', False, (255, 255, 255))
             Text(self.non_moving_sprites, text, (SCREEN_WIDTH // 2 - text.get_width() // 2, 0))
-            Text(self.non_moving_sprites, text2, (SCREEN_HEIGHT // 2 - text2.get_width() // 2, text.get_width()))
+            Text(self.non_moving_sprites, text2, (SCREEN_WIDTH // 2 - text2.get_width() // 2, text.get_width()))
         elif level == 4:
             self.tilemap('./lvls/Level4.csv')
             self.players = []
