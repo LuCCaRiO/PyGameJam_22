@@ -1,4 +1,6 @@
 import math
+import sys
+from text import Text
 import pygame as pg
 from settings import *
 from entity import Entity
@@ -11,7 +13,7 @@ ANIMATION_SPEED = 0.01
 P_WIDTH = TILE_SIZE * 0.4
 P_HEIGHT = TILE_SIZE * 0.6
 
-MAX_TIME = 3000
+MAX_TIME = 2000
 
 
 class Player(Entity):
@@ -32,7 +34,9 @@ class Player(Entity):
         self.pick_up_sound = pg.mixer.Sound('./sfx/click.wav')
         self.collidable_groups = collidable_groups
         self.id = id_
+        self.font = pg.font.SysFont('bahnschrift', 100)
         self.jumpscare_groups = jumpscare_groups
+        self.exit = False
 
     def input(self):
         self.speed = pg.math.Vector2()
@@ -85,10 +89,26 @@ class Player(Entity):
                 sprite.kill()
         return list_of_items
 
-    def custom_collision(self):
+    def custom_collision(self, level, delta_time):
+        if self.exit and self.time < MAX_TIME:
+            self.time += delta_time
+        elif self.exit and self.time > MAX_TIME:
+            sys.exit()
+
         for sprite in self.collidable_groups[EXIT_KEY]:
             if self.rect.colliderect(sprite.rect):
-                return True
+                if level >= 6:
+                    image = pg.surface.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+                    image.fill((0, 0, 0))
+                    text = self.font.render('YOU ESCAPED', False, (255, 0, 0))
+                    image.blit(text,
+                               (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - text.get_height() // 2))
+                    Text(self.jumpscare_groups, image, (0, 0))
+                    sprite.kill()
+                    self.time = 0
+                    self.exit = True
+                else:
+                    return True
         return False
 
     def animation(self, delta_time):
@@ -107,7 +127,7 @@ class Player(Entity):
         self.vertical_collision()
 
     def enemy_collision(self, delta_time):
-        if self.jumpscare:
+        if self.jumpscare and self.time < MAX_TIME:
             self.time += delta_time
         for sprite in self.collidable_groups[MONEMY_KEY]:
             if sprite.rect.colliderect(self.rect):
@@ -115,6 +135,7 @@ class Player(Entity):
                 Jumpscare(self.jumpscare_groups, (0, 0))
                 self.jumpscare = True
         if self.time > MAX_TIME and self.jumpscare:
+            self.jumpscare = False
             return True
         else:
             return False

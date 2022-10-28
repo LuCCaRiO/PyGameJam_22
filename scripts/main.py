@@ -19,7 +19,7 @@ from dark_view_field import DarkViewField
 
 class Game:
     def __init__(self):
-        self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pg.FULLSCREEN)
+        self.screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pg.display.set_caption(GAME_NAME)
 
         self.rendered_sprites = Camera()
@@ -39,7 +39,7 @@ class Game:
 
         self.item_list = []
 
-        self.font = pg.font.SysFont('bahnschrift', 50)
+        self.font = pg.font.SysFont('bahnschrift', 30)
         self.offset = pg.math.Vector2
 
         with open(f'{os.getcwd()}/ savegame/level', 'r') as file:
@@ -57,7 +57,7 @@ class Game:
                     if player.enemy_collision(delta_time):
                         self.reset()
                         self.create_world(self.level)
-                if self.players[self.player_num].custom_collision():
+                if self.players[self.player_num].custom_collision(self.level, delta_time):
                     self.level += 1
                     with open(f'{os.getcwd()}/ savegame/level', 'w') as file:
                         file.truncate()
@@ -113,8 +113,10 @@ class Game:
             elif event.type == pg.MOUSEBUTTONDOWN:
                 for item in self.item_list:
                     if item == 'Box' and math.hypot(
-                            self.players[self.player_num].rect.centerx - mouse[0] - self.offset.x,
-                            self.players[self.player_num].rect.centery - mouse[1] - self.offset.y) <= TILE_SIZE * 2:
+                            int(self.players[self.player_num].rect.centerx / TILE_SIZE) * TILE_SIZE - int(
+                                (mouse[0] + self.offset.x) / TILE_SIZE) * TILE_SIZE,
+                            int(self.players[self.player_num].rect.centery / TILE_SIZE) * TILE_SIZE - int(
+                                (mouse[1] + self.offset.y) / TILE_SIZE) * TILE_SIZE) <= TILE_SIZE * 1.5:
                         x = int((mouse[0] + self.offset.x) / TILE_SIZE) * TILE_SIZE
                         y = int((mouse[1] + self.offset.y) / TILE_SIZE) * TILE_SIZE
                         box = Box((self.rendered_sprites, self.items, self.walls), (x, y))

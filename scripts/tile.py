@@ -64,7 +64,7 @@ class FakeTile(Tile):
         self.text_groups = text_groups
         self.enemey_pos = enemy_pos
         self.chasing_music = pg.mixer.Sound('./sfx/No_Drums_Or_Percussion-2022-10-10_-_Right_Behind_You_-_www.wav')
-        font = pg.font.SysFont('arial', 80)
+        font = pg.font.SysFont('tahomasd', 80)
         self.text = font.render('RUN', False, (255, 0, 0))
 
     def update(self, delta_time, player_num, open_door, players):
